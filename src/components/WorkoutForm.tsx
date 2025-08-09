@@ -4,21 +4,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Loader2, Dumbbell } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Dumbbell, Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 
 interface WorkoutFormData {
   objective: string;
   trainingDays: string[];
   equipment: string;
   restTime: string;
+  height: string;
+  weight: string;
+  gender: string;
+  age: string;
 }
 
 export const WorkoutForm = () => {
+  const { theme, setTheme } = useTheme();
   const [formData, setFormData] = useState<WorkoutFormData>({
     objective: "",
     trainingDays: [],
     equipment: "",
     restTime: "",
+    height: "",
+    weight: "",
+    gender: "",
+    age: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [workoutPlan, setWorkoutPlan] = useState<string>("");
@@ -43,7 +54,7 @@ export const WorkoutForm = () => {
   };
 
   const handleSubmit = async () => {
-    if (!formData.objective || formData.trainingDays.length === 0 || !formData.equipment || !formData.restTime) {
+    if (!formData.objective || formData.trainingDays.length === 0 || !formData.equipment || !formData.restTime || !formData.height || !formData.weight || !formData.gender || !formData.age) {
       return;
     }
 
@@ -59,6 +70,7 @@ export const WorkoutForm = () => {
 **Dias de Treino:** ${formData.trainingDays.join(", ")}
 **Equipamentos:** ${formData.equipment}
 **Descanso entre séries:** ${formData.restTime}
+**Perfil:** ${formData.gender}, ${formData.age} anos, ${formData.height}cm, ${formData.weight}kg
 
 **SEGUNDA-FEIRA - Treino A**
 • Agachamento - 3x12
@@ -85,11 +97,27 @@ export const WorkoutForm = () => {
     }
   };
 
-  const isFormValid = formData.objective && formData.trainingDays.length > 0 && formData.equipment && formData.restTime;
+  const isFormValid = formData.objective && formData.trainingDays.length > 0 && formData.equipment && formData.restTime && formData.height && formData.weight && formData.gender && formData.age;
 
   return (
     <div className="min-h-screen bg-gradient-subtle py-8 px-4">
       <div className="max-w-4xl mx-auto">
+        {/* Theme Toggle */}
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="bg-background/80 hover:bg-background"
+          >
+            {theme === "dark" ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -193,6 +221,74 @@ export const WorkoutForm = () => {
                     <SelectItem value="90s">90 segundos</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              {/* Personal Info */}
+              <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-lg font-semibold">Informações Pessoais</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="height" className="text-base font-medium">
+                      Altura (cm)
+                    </Label>
+                    <Input
+                      id="height"
+                      type="number"
+                      placeholder="Ex: 175"
+                      value={formData.height}
+                      onChange={(e) => setFormData(prev => ({ ...prev, height: e.target.value }))}
+                      className="h-12"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="weight" className="text-base font-medium">
+                      Peso (kg)
+                    </Label>
+                    <Input
+                      id="weight"
+                      type="number"
+                      placeholder="Ex: 70"
+                      value={formData.weight}
+                      onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
+                      className="h-12"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="gender" className="text-base font-medium">
+                      Sexo
+                    </Label>
+                    <Select value={formData.gender} onValueChange={(value) => 
+                      setFormData(prev => ({ ...prev, gender: value }))
+                    }>
+                      <SelectTrigger className="h-12">
+                        <SelectValue placeholder="Selecione o sexo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="masculino">Masculino</SelectItem>
+                        <SelectItem value="feminino">Feminino</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="age" className="text-base font-medium">
+                      Idade
+                    </Label>
+                    <Input
+                      id="age"
+                      type="number"
+                      placeholder="Ex: 25"
+                      value={formData.age}
+                      onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                      className="h-12"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Submit Button */}
